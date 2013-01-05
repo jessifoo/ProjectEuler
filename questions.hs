@@ -1,3 +1,4 @@
+
 --questions.hs
 
 --Question 1
@@ -53,33 +54,157 @@ The prime factors of 13195 are 5, 7, 13 and 29.
 What is the largest prime factor of the number 600851475143 ?
 -}
 
---determinePrimes num list
---	| 
+primeFactor:: Integral a => a -> a
+primeFactor num
+	| isPrime num		= num
+	| otherwise			= primeFactorHelper num (ceiling (sqrt (fromIntegral num)))
+
+primeFactorHelper:: Integral a => a -> a-> a
+primeFactorHelper num sqrtNum
+	| (sqrtNum <= 0)										= 0
+	| ((mod num sqrtNum) == 0) && (isPrime (sqrtNum))				= sqrtNum
+	| otherwise												= primeFactorHelper num (sqrtNum-1)
+
+isPrime k = null [ x | x <- [2..k-1], k `mod` x  == 0]
+
+
+
+-- Question 4
+
+{- 
+Find the largest palindrome made from the product of two 3-digit numbers. 
+-}
+
+getMaxPalindrome = maximum palindrome
+
+palindrome = [ (isPalindrome (i*j)) | i <- [999,998 .. 450], j <- [999,998 .. 450] ]
+
+isPalindrome num
+	| isPalindromeHelper (digits num)		= num
+	| otherwise								= 0
+
+isPalindromeHelper x = (x == rev x)
+
+--digits :: Int -> [Int]
+digits 0 = []
+digits n = digits k ++ [r]
+    where k = div n 10; r = mod n 10
+
+rev [] = [] 
+rev (x:xs) = reverse xs ++ [x] 
+
+
+-- Question 5
+
+{-
+2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
+What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
+-}
+
+smallestNum = getSmallestNum 40
+
+getSmallestNum num
+	| num >= 2432902008176640000			= 2432902008176640000
+	| length (isEvenlyDivisible num) == 20  = num
+	| otherwise								= getSmallestNum (num+20)
+
+isEvenlyDivisible k = [ x | x <- [1..20], k `mod` x == 0]
+
+-- foldl1 lcm [1..20]
+
+
+-- Question 6
+
+{-
+The sum of the squares of the first ten natural numbers is,
+
+12 + 22 + ... + 102 = 385
+The square of the sum of the first ten natural numbers is,
+
+(1 + 2 + ... + 10)2 = 552 = 3025
+Hence the difference between the sum of the squares of the first ten natural numbers and the square of the sum is 3025  385 = 2640.
+
+Find the difference between the sum of the squares of the first one hundred natural numbers and the square of the sum.
+-}
+
+q6 = (squareSum listNums) - (sumSquares listNums)
+
+listNums = [x | x <- [1..100]]
+
+sumSquares list = sum (map square list)
+
+squareSum list = square (sum list)
+
+square x = x*x
+
+-- Question 7
+
+{-
+By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.
+What is the 10 001st prime number?
+-}
+
+
+-- Question 8
+
+{-
+Find the greatest product of five consecutive digits in the 1000-digit number.
+
+7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450
+-}
+
+--num = "7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450"
+
+largestProduct num = max (getListProducts num [])
+
+getListProducts num list
+	| null (take 5 num)		= list
+	| otherwise					= getListProducts (drop 1 num) (list ++ (calcProduct (take 5 num) 1))
 	
--- boolean = false
-andList list = not ((head list) && (andList (tail list)))
-
-isPrime num list 
-	| list == []							= []
-	| (mod num (head list)) == 0			= True:(isPrime num (tail list))
-	| otherwise								= False:(isPrime num (tail list))
-
-
 	
-notFirstOrLast num count list  
-	| num == 0 					= list
-	| count == (num)			= reverse list
-	| otherwise					= (notFirstOrLast num (count+1) (count:list))
-	
+calcProduct nums ans
+	| (length nums) == 1		= ans
+	| otherwise					= calcProduct (tail nums) (ans*(head nums))
 
---takes in number to get factors from and an empty list to start
---getFactors:: Double->[Double]->[Double]
-getFactors num = getFactorsHelper num 1 []
+-- Question 10
 
-getFactorsHelper num count list
-	| count == num 					= list
-	| (mod num count) == 0			= count:(getFactorsHelper num (count+1) list)
-	| otherwise						= getFactorsHelper num (count+1) list			
+{-
+The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
+
+Find the sum of all the primes below two million.
+-}
+
+sumPrimes num = sumPrimesHelper (num-1) 0
+
+sumPrimesHelper num count
+	| num == 0				= count
+	| isPrime(num)			= sumPrimesHelper (num-1) (count+num)
+	| otherwise				= sumPrimesHelper (num-1) count
+
+
+
+
+
+-- Question 16
+
+sumNumThousand = sum (digits (2^1000))
+
+
+
+-- Question 20
+
+sumFact100 = sum (digits (fact 100))
+
+fact n = fact_helper n 1
+
+fact_helper n product
+	| n == 0		= product
+	| otherwise		= fact_helper (n-1) (product * n)
+
+
+
+
+
 
 
 
